@@ -1,0 +1,38 @@
+From 2277353c0912246c4e9c153e8670a90947375728 Mon Sep 17 00:00:00 2001
+From: Joshua Rodriguez <ewized@gmail.com>
+Date: Tue, 2 Sep 2014 10:49:45 -0700
+Subject: [PATCH] Allow the number of online players to be changed
+
+
+diff --git a/src/main/java/org/bukkit/event/server/ServerListPingEvent.java b/src/main/java/org/bukkit/event/server/ServerListPingEvent.java
+index c61afdf..b8196e4 100644
+--- a/src/main/java/org/bukkit/event/server/ServerListPingEvent.java
++++ b/src/main/java/org/bukkit/event/server/ServerListPingEvent.java
+@@ -17,7 +17,7 @@ public class ServerListPingEvent extends ServerEvent implements Iterable<Player>
+     private static final HandlerList handlers = new HandlerList();
+     private final InetAddress address;
+     private String motd;
+-    private final int numPlayers;
++    private int numPlayers;
+     private int maxPlayers;
+ 
+     public ServerListPingEvent(final InetAddress address, final String motd, final int numPlayers, final int maxPlayers) {
+@@ -84,6 +84,15 @@ public class ServerListPingEvent extends ServerEvent implements Iterable<Player>
+     }
+ 
+     /**
++     * Set the number of players sent.
++     *
++     * @param numPlayers the number of players
++     */
++    public void setNumPlayers(int numPlayers) {
++        this.numPlayers = numPlayers;
++    }
++
++    /**
+      * Get the maximum number of players sent.
+      *
+      * @return the maximum number of players
+-- 
+1.9.1
+
