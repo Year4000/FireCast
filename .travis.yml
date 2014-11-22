@@ -6,3 +6,5 @@ notifications:
 before_install:
   - git config --global user.email "year4000@year4000.net"
   - git config --global user.name "Year4000"
+install:
+  - ./build.sh
