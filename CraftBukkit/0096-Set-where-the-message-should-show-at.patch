@@ -1,0 +1,43 @@
+From 5489d58d5caef8dc039b3aeeb8c4ac60dae1135a Mon Sep 17 00:00:00 2001
+From: Joshua Rodriguez <ewized@gmail.com>
+Date: Sun, 16 Nov 2014 16:04:01 -0800
+Subject: [PATCH] Set where the message should show at
+
+
+diff --git a/src/main/java/net/minecraft/server/PacketPlayOutChat.java b/src/main/java/net/minecraft/server/PacketPlayOutChat.java
+index fdbdcc6..03c64af 100644
+--- a/src/main/java/net/minecraft/server/PacketPlayOutChat.java
++++ b/src/main/java/net/minecraft/server/PacketPlayOutChat.java
+@@ -6,6 +6,7 @@ public class PacketPlayOutChat extends Packet {
+ 
+     private IChatBaseComponent a;
+     private boolean b;
++    private byte p = 0; // FireCast chat position
+ 
+     public PacketPlayOutChat() {
+         this.b = true;
+@@ -21,6 +22,12 @@ public class PacketPlayOutChat extends Packet {
+         this.b = flag;
+     }
+ 
++    public PacketPlayOutChat(IChatBaseComponent ichatbasecomponent, byte position) {
++        this.a = ichatbasecomponent;
++        this.b = true;
++        this.p = position;
++    }
++
+     public void a(PacketDataSerializer packetdataserializer) throws IOException {
+         this.a = ChatSerializer.a(packetdataserializer.c(32767));
+     }
+@@ -30,7 +37,7 @@ public class PacketPlayOutChat extends Packet {
+         // Spigot start - protocol patch
+         if ( packetdataserializer.version >= 16 )
+         {
+-            packetdataserializer.writeByte(0);
++            packetdataserializer.writeByte(p);
+         }
+         // Spigot end
+     }
+-- 
+1.9.1
+

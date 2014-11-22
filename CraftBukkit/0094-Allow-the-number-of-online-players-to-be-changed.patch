@@ -1,0 +1,31 @@
+From 1ee32f4f6b96feb78d3558d849f32e8c484777c1 Mon Sep 17 00:00:00 2001
+From: Joshua Rodriguez <ewized@gmail.com>
+Date: Tue, 2 Sep 2014 10:48:00 -0700
+Subject: [PATCH] Allow the number of online players to be changed
+
+
+diff --git a/src/main/java/net/minecraft/server/PacketStatusListener.java b/src/main/java/net/minecraft/server/PacketStatusListener.java
+index 89f16c0..6b6cfe2 100644
+--- a/src/main/java/net/minecraft/server/PacketStatusListener.java
++++ b/src/main/java/net/minecraft/server/PacketStatusListener.java
+@@ -40,7 +40,7 @@ public class PacketStatusListener implements PacketStatusInListener {
+             CraftIconCache icon = minecraftServer.server.getServerIcon();
+ 
+             ServerListPingEvent() {
+-                super(((InetSocketAddress) networkManager.getSocketAddress()).getAddress(), minecraftServer.getMotd(), minecraftServer.getPlayerList().getMaxPlayers());
++                super(((InetSocketAddress) networkManager.getSocketAddress()).getAddress(), minecraftServer.getMotd(), minecraftServer.getPlayerList().getPlayerCount(), minecraftServer.getPlayerList().getMaxPlayers());
+             }
+ 
+             @Override
+@@ -109,7 +109,7 @@ public class PacketStatusListener implements PacketStatusInListener {
+             }
+         }
+ 
+-        ServerPingPlayerSample playerSample = new ServerPingPlayerSample(event.getMaxPlayers(), profiles.size());
++        ServerPingPlayerSample playerSample = new ServerPingPlayerSample(event.getMaxPlayers(), event.getNumPlayers());
+         playerSample.a(profiles.toArray(new GameProfile[profiles.size()]));
+ 
+         ServerPing ping = new ServerPing();
+-- 
+1.9.1
+

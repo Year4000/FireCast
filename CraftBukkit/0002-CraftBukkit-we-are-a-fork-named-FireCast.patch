@@ -1,0 +1,83 @@
+From 374c9be80c7519ad70098514bef809f6bffc2494 Mon Sep 17 00:00:00 2001
+From: Joshua Rodriguez <ewized@gmail.com>
+Date: Fri, 21 Nov 2014 16:23:30 -0800
+Subject: [PATCH] CraftBukkit we are a fork named FireCast
+
+
+diff --git a/pom.xml b/pom.xml
+index 8dc82eb..b87859d 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -1,12 +1,12 @@
+ <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+-  <groupId>org.bukkit</groupId>
+-  <artifactId>craftbukkit</artifactId>
++  <groupId>net.year4000</groupId>
++  <artifactId>firecast</artifactId>
+   <packaging>jar</packaging>
+   <version>1.7.10-R0.1-SNAPSHOT</version>
+-  <name>CraftBukkit</name>
+-  <url>http://www.bukkit.org</url>
++  <name>FireCast</name>
++  <url>https://www.year4000.net/</url>
+ 
+   <properties>
+     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+@@ -14,7 +14,7 @@
+     <junit.version>4.11</junit.version>
+     <minecraft.version>1.7.10</minecraft.version>
+     <minecraft_version>1_7_R4</minecraft_version>
+-    <buildtag.prefix>git-Bukkit-</buildtag.prefix>
++    <buildtag.prefix>git-FireCast-</buildtag.prefix>
+     <buildtag.suffix></buildtag.suffix>
+   </properties>
+ 
+@@ -24,19 +24,6 @@
+     <url>https://github.com/Bukkit/CraftBukkit</url>
+   </scm>
+ 
+-  <distributionManagement>
+-    <repository>
+-      <id>repobo-rel</id>
+-      <name>repo.bukkit.org Releases</name>
+-      <url>http://repo.bukkit.org/content/repositories/releases/</url>
+-    </repository>
+-    <snapshotRepository>
+-      <id>repobo-snap</id>
+-      <name>repo.bukkit.org Snapshots</name>
+-      <url>http://repo.bukkit.org/content/repositories/snapshots/</url>
+-    </snapshotRepository>
+-  </distributionManagement>
+-
+   <repositories>
+     <repository>
+       <id>repobo-snap</id>
+@@ -53,8 +40,8 @@
+ 
+   <dependencies>
+     <dependency>
+-      <groupId>org.bukkit</groupId>
+-      <artifactId>bukkit</artifactId>
++      <groupId>net.year4000</groupId>
++      <artifactId>firecast-api</artifactId>
+       <version>${project.version}</version>
+       <type>jar</type>
+       <scope>compile</scope>
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index a666131..d79c68f 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -193,7 +193,7 @@ import jline.console.ConsoleReader;
+ 
+ public final class CraftServer implements Server {
+     private static final Player[] EMPTY_PLAYER_ARRAY = new Player[0];
+-    private final String serverName = "CraftBukkit";
++    private final String serverName = "FireCast";
+     private final String serverVersion;
+     private final String bukkitVersion = Versioning.getBukkitVersion();
+     private final Logger logger = Logger.getLogger("Minecraft");
+-- 
+1.9.1
+
