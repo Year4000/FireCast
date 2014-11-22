@@ -1,0 +1,21 @@
+From 8a24824000a73ae3e8f45e7c260f2197b622e7f1 Mon Sep 17 00:00:00 2001
+From: Joshua Rodriguez <ewized@gmail.com>
+Date: Fri, 21 Nov 2014 16:35:42 -0800
+Subject: [PATCH] Make the output clean and simple
+
+
+diff --git a/pom.xml b/pom.xml
+index bca8030..d4705da 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -139,6 +139,7 @@
+   <!-- This builds a completely 'ready to start' jar with all dependencies inside -->
+   <build>
+     <defaultGoal>clean install</defaultGoal>
++    <finalName>${project.name}</finalName>
+     <plugins>
+       <plugin>
+         <groupId>com.lukegb.mojo</groupId>
+-- 
+1.9.1
+
