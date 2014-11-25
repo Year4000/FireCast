@@ -4,6 +4,7 @@
 # Vim generated files
 *~
 *.swp
+.idea/
 
 # Miscellaneous
 build/
