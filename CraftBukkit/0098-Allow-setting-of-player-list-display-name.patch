@@ -1,0 +1,160 @@
+From c9efe4513cab632145601f40d11cb635d67a0ac2 Mon Sep 17 00:00:00 2001
+From: Joshua Rodriguez <ewized@gmail.com>
+Date: Tue, 25 Nov 2014 10:45:02 -0800
+Subject: [PATCH] Allow setting of player list display name
+
+
+diff --git a/src/main/java/net/minecraft/server/EntityPlayer.java b/src/main/java/net/minecraft/server/EntityPlayer.java
+index 0689ea8..10cf79d 100644
+--- a/src/main/java/net/minecraft/server/EntityPlayer.java
++++ b/src/main/java/net/minecraft/server/EntityPlayer.java
+@@ -58,6 +58,7 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
+     // CraftBukkit start
+     public String displayName;
+     public String listName;
++    public String listDisplayName;
+     public org.bukkit.Location compassTarget;
+     public int newExp = 0;
+     public boolean collidesWithEntities = true; // CraftBukkit
+diff --git a/src/main/java/net/minecraft/server/PacketPlayOutPlayerInfo.java b/src/main/java/net/minecraft/server/PacketPlayOutPlayerInfo.java
+index 9486772..8e5e381 100644
+--- a/src/main/java/net/minecraft/server/PacketPlayOutPlayerInfo.java
++++ b/src/main/java/net/minecraft/server/PacketPlayOutPlayerInfo.java
+@@ -112,7 +112,7 @@ public class PacketPlayOutPlayerInfo extends Packet {
+         packet.entries = Collections.singletonList(new Entry(
+             player.getProfile().getId(),
+             player.listName,
+-            ChatSerializer.a(CraftChatMessage.fromString(player.listName)[0]),
++            player.listDisplayName == null ? null : ChatSerializer.a(CraftChatMessage.fromString(player.listDisplayName)[0]),
+             player.playerInteractManager.getGameMode().getId(),
+             player.ping,
+             player.getProfile().getProperties()
+@@ -126,33 +126,32 @@ public class PacketPlayOutPlayerInfo extends Packet {
+     }
+ 
+     public void b(PacketDataSerializer packetdataserializer) throws java.io.IOException { // CraftBukkit - added throws
+-        if ( packetdataserializer.version >= 20 )
+-        {
++        if ( packetdataserializer.version >= 20 ) {
+             packetdataserializer.b( action );
+             packetdataserializer.b( this.entries.size() );
+ 
+-            for(Entry entry : this.entries) {
+-                packetdataserializer.writeUUID( entry.uuid );
+-                switch ( action )
+-                {
++            for (Entry entry : this.entries) {
++                boolean displayName = entry.displayName != null;
++                packetdataserializer.writeUUID(entry.uuid);
++
++                switch (action) {
+                     case ADD_PLAYER:
+                         packetdataserializer.a( entry.name );
+                         packetdataserializer.b( entry.properties.size() );
+-                        for ( Property property : entry.properties.values() )
+-                        {
++                        for (Property property : entry.properties.values()) {
+                             packetdataserializer.a( property.getName() );
+                             packetdataserializer.a( property.getValue() );
+-                            packetdataserializer.writeBoolean( property.hasSignature() );
+-                            if ( property.hasSignature() )
+-                            {
+-                                packetdataserializer.a( property.getSignature() );
++                            packetdataserializer.writeBoolean(property.hasSignature());
++                            if (property.hasSignature()) {
++                                packetdataserializer.a(property.getSignature());
+                             }
+                         }
++
+                         packetdataserializer.b( entry.gamemode );
+                         packetdataserializer.b( entry.ping );
+-                        packetdataserializer.writeBoolean( entry.displayName != null );
+-                        if ( entry.displayName != null )
+-                        {
++                        packetdataserializer.writeBoolean(displayName);
++
++                        if (displayName) {
+                             packetdataserializer.a(entry.displayName);
+                         }
+                         break;
+@@ -163,9 +162,9 @@ public class PacketPlayOutPlayerInfo extends Packet {
+                         packetdataserializer.b( entry.ping );
+                         break;
+                     case UPDATE_DISPLAY_NAME:
+-                        packetdataserializer.writeBoolean( entry.displayName != null );
+-                        if ( entry.displayName != null )
+-                        {
++                        packetdataserializer.writeBoolean(displayName);
++
++                        if (displayName) {
+                             packetdataserializer.a(entry.displayName);
+                         }
+                         break;
+@@ -175,13 +174,14 @@ public class PacketPlayOutPlayerInfo extends Packet {
+                 }
+             }
+         } else {
+-            if(this.entries.size() != 1) {
++            if (this.entries.size() != 1) {
+                 throw new IOException("Cannot send multiple player list items in a single packet to 1.7 client");
+             }
++
+             Entry entry = this.entries.get(0);
+-            packetdataserializer.a( entry.name );
+-            packetdataserializer.writeBoolean( action != REMOVE_PLAYER );
+-            packetdataserializer.writeShort( entry.ping );
++            packetdataserializer.a(entry.name);
++            packetdataserializer.writeBoolean(action != REMOVE_PLAYER);
++            packetdataserializer.writeShort(entry.ping);
+         }
+     }
+ 
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index 880823e..28e56f7 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -481,6 +481,33 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     }
+ 
+     @Override
++    public void setPlayerListDisplayName(final String name) {
++        String oldDisplayName = getHandle().listDisplayName;
++
++        if (oldDisplayName != null && oldDisplayName.equals(name)) {
++            return;
++        }
++
++        getHandle().listDisplayName = name;
++
++        for (int i = 0; i < server.getHandle().players.size(); ++i) {
++            EntityPlayer entityplayer = (EntityPlayer) server.getHandle().players.get(i);
++            if (entityplayer.playerConnection == null) continue;
++
++            if (entityplayer.getBukkitEntity().canSee(this) && entityplayer.getBukkitEntity().getPlayerListUpdates()) {
++                if (entityplayer.playerConnection.networkManager.getVersion() >= 28) {
++                    entityplayer.playerConnection.sendPacket(PacketPlayOutPlayerInfo.updateDisplayName(getHandle()));
++                }
++            }
++        }
++    }
++
++    @Override
++    public String getPlayerListDisplayName() {
++        return getHandle().listDisplayName;
++    }
++
++    @Override
+     public String getPlayerListName() {
+         return getHandle().listName;
+     }
+@@ -521,6 +548,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         getHandle().listName = temp;
+         PacketPlayOutPlayerInfo packet = PacketPlayOutPlayerInfo.addPlayer(getHandle());
+         PacketPlayOutPlayerInfo newPacket = PacketPlayOutPlayerInfo.updateDisplayName(getHandle());
++
+         for (int i = 0; i < server.getHandle().players.size(); ++i) {
+             EntityPlayer entityplayer = (EntityPlayer) server.getHandle().players.get(i);
+             if (entityplayer.playerConnection == null) continue;
+-- 
+1.9.1
+
