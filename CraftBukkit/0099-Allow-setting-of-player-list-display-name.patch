@@ -1,0 +1,65 @@
+From 1dbc9fc18bcd9997bc1f40b4d2496b495c122506 Mon Sep 17 00:00:00 2001
+From: Joshua Rodriguez <ewized@gmail.com>
+Date: Mon, 24 Nov 2014 20:28:27 -0800
+Subject: [PATCH] Allow setting of player list display name
+
+
+diff --git a/src/main/java/net/minecraft/server/EntityPlayer.java b/src/main/java/net/minecraft/server/EntityPlayer.java
+index 0689ea8..10cf79d 100644
+--- a/src/main/java/net/minecraft/server/EntityPlayer.java
++++ b/src/main/java/net/minecraft/server/EntityPlayer.java
+@@ -58,6 +58,7 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
+     // CraftBukkit start
+     public String displayName;
+     public String listName;
++    public String listDisplayName;
+     public org.bukkit.Location compassTarget;
+     public int newExp = 0;
+     public boolean collidesWithEntities = true; // CraftBukkit
+diff --git a/src/main/java/net/minecraft/server/PacketPlayOutPlayerInfo.java b/src/main/java/net/minecraft/server/PacketPlayOutPlayerInfo.java
+index b31b7de..d0b4f20 100644
+--- a/src/main/java/net/minecraft/server/PacketPlayOutPlayerInfo.java
++++ b/src/main/java/net/minecraft/server/PacketPlayOutPlayerInfo.java
+@@ -112,7 +112,7 @@ public class PacketPlayOutPlayerInfo extends Packet {
+         packet.entries = Collections.singletonList(new Entry(
+             player.getProfile().getId(),
+             player.listName,
+-            ChatSerializer.a(CraftChatMessage.fromString(player.listName)[0]),
++            ChatSerializer.a(CraftChatMessage.fromString(player.listDisplayName)[0]),
+             player.playerInteractManager.getGameMode().getId(),
+             player.ping,
+             player.getProfile().getProperties()
+@@ -132,7 +132,6 @@ public class PacketPlayOutPlayerInfo extends Packet {
+             packetdataserializer.b( this.entries.size() );
+ 
+             for(Entry entry : this.entries) {
+-                entry.displayName = null; // FireCast Disable display names until proper api
+                 boolean displayName = entry.displayName != null;
+                 packetdataserializer.writeUUID( entry.uuid );
+                 switch ( action )
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index 880823e..726376c 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -481,6 +481,18 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     }
+ 
+     @Override
++    public void setPlayerListDisplayName(final String name) {
++        getHandle().listDisplayName = name;
++
++        setPlayerListName(getPlayerListName());
++    }
++
++    @Override
++    public String getPlayerListDisplayName() {
++        return getHandle().listDisplayName;
++    }
++
++    @Override
+     public String getPlayerListName() {
+         return getHandle().listName;
+     }
+-- 
+1.9.1
+

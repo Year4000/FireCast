@@ -1,0 +1,26 @@
+From 269b4f96aa16299b4f2abaa7c9054394674b008f Mon Sep 17 00:00:00 2001
+From: Joshua Rodriguez <ewized@gmail.com>
+Date: Mon, 24 Nov 2014 20:28:33 -0800
+Subject: [PATCH] Allow setting of player list display name
+
+
+diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
+index 224d597..4cff9d9 100644
+--- a/src/main/java/org/bukkit/entity/Player.java
++++ b/src/main/java/org/bukkit/entity/Player.java
+@@ -110,6 +110,12 @@ public interface Player extends HumanEntity, Conversable, CommandSender, Offline
+      */
+     public String getPlayerListName();
+ 
++    /** Get the name that is shown on the in-game player list */
++    public String getPlayerListDisplayName();
++
++    /** Set the name that is shown on the in-game player list */
++    public void setPlayerListDisplayName(String name);
++
+     /**
+      * Sets the name that is shown on the in-game player list.
+      * <p>
+-- 
+1.9.1
+
